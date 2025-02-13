@@ -25,8 +25,8 @@ public class GetSMSRequestModel {
         return PersonId;
     }
 
-    public int getConsent() {
-        return Integer.parseInt(Consent);
+    public String getConsent() {
+        return Consent;
     }
 
 
