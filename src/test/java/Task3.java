@@ -1,4 +1,4 @@
-import Models.SMSModule.GetSMSRequestModel;
+import Models.SMSModule.GetConsent.GetSMSRequestModel;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.testng.Assert;

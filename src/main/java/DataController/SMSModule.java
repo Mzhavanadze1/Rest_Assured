@@ -1,8 +1,8 @@
 package DataController;
 
 import DataBaseAccessSQL.DataBaseAccessSQL;
-import Models.SMSModule.GetSMSRequestModel;
-import org.testng.annotations.Test;
+import Models.SMSModule.GetConsent.GetSMSRequestModel;
+import Models.SMSModule.PostConsent.PostSmsRequestModel;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -49,12 +49,73 @@ public class SMSModule {
             
             """;
 
+    public static String queryOfSMSModuleTaskPost = """
+            IF object_ID('tempbd..#tmp') is not null
+                                        drop
+                                          table #tempAL
+                                        select
+                                          *,
+                                          ROW_NUMBER() over(
+                                            order by
+                                              a.personId
+                                          ) as rowNumber into #tempAL
+                                        from
+                                          (
+                                            SELECT
+                                              top 3 a.personId,
+                                              cast(a.TelNumber as varchar) as TelNumber,
+                                              iiF (a.Consent = 1, 3, 1) as Consent,
+                                              a.Channel
+                                            FROM
+                                              [SMSModuleDB].[dbo].[AdSMSConsent] as a
+                                            where
+                                              a.PersonId is not null
+                                              and a.TelNumber is not null
+                                              and a.Channel is not null
+                                            union
+                                            select
+                                              top 1 a.PersonId,
+                                              a.Contact,
+                                              '3' as consent,
+                                              '152021' as channel
+                                            from
+                                              CredoBnk.person.Contact as a
+                                              left join [SMSModuleDB].[dbo].[AdSMSConsent] as b on a.PersonId = b.PersonId\s
+                                              left join [SMSModuleDB].[dbo].[AdSMSConsent] as c on a.Contact = c.TelNumber\s
+                                            where
+                                              b.PersonId is null
+                                              and c.PersonId is null
+                                          ) as a
+                                        update
+                                          a
+                                        set
+                                          a.PersonId = null
+                                        from
+                                          #tempAL as a where a.rowNumber=1
+                                        update
+                                          a
+                                        set
+                                          a.TelNumber = null
+                                        from
+                                          #tempAL as a where a.rowNumber=2
+                                        update
+                                          a
+                                        set
+                                          a.Channel = null
+                                        from
+                                          #tempAL as a where a.rowNumber=3
+                                        select
+                                          *
+                                        from
+                                          #tempAL as a
+            
+            """;
+
     public static List<GetSMSRequestModel> getSMSRequestModels(String query) throws SQLException, ClassNotFoundException {
         List<GetSMSRequestModel> getSMSRequestModels = new ArrayList<>();
         Connection databBaseAccessSQL = DataBaseAccessSQL.connectSQL();
         ResultSet resultSet;
 
-        assert databBaseAccessSQL != null;
         PreparedStatement preparedStatement = databBaseAccessSQL.prepareStatement(query);
         resultSet = preparedStatement.executeQuery();
         while (resultSet.next()) {
@@ -71,10 +132,36 @@ public class SMSModule {
         return getSMSRequestModels;
     }
 
+    public static List<PostSmsRequestModel> postSmsRequestModels(String query) throws SQLException, ClassNotFoundException {
+        List<PostSmsRequestModel> postSmsResponseData = new ArrayList<>();
+        Connection dataBaseAccessSQL = DataBaseAccessSQL.connectSQL();
+        ResultSet resultSet;
 
+        PreparedStatement preparedStatement = dataBaseAccessSQL.prepareStatement(query);
+        resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+            PostSmsRequestModel postSMSRequestModel = new PostSmsRequestModel();
+            postSMSRequestModel.setPersonId(resultSet.getString("PersonId"));
+            postSMSRequestModel.setTelNumber(resultSet.getString("TelNumber"));
+            postSMSRequestModel.setStatus(resultSet.getInt("Consent"));
+            postSMSRequestModel.setChannelId(resultSet.getString("Channel"));
+            postSmsResponseData.add(postSMSRequestModel);
+
+
+        }
+        return postSmsResponseData;
+    }
+    public static Object[][] postSmsRequest(List<PostSmsRequestModel> postSmsRequestModels) throws SQLException{
+        Object[][] data = new Object[postSmsRequestModels.size()][1];
+        for (int i = 0; i < postSmsRequestModels.size(); i++) {
+            data[i][0]=postSmsRequestModels.get(i);
+        }
+        return data;
+    }
 
 
     }
+
 
 
 

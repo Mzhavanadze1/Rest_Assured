@@ -1,4 +1,4 @@
-package Models.SMSModule;
+package Models.SMSModule.GetConsent;
 
 public class GetSMSResponseModel {
     public Data data;

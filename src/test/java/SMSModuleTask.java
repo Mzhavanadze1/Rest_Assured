@@ -1,16 +1,14 @@
 import DataController.SMSModule;
-import Models.SMSModule.GetSMSRequestModel;
+import Models.SMSModule.GetConsent.GetSMSRequestModel;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.testng.Assert;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.sql.SQLException;
 import java.util.List;
 
 import static DataController.SMSModule.getSMSRequestModels;
-import static DataController.SMSModule.queryOfSMSModuleTask;
 import static io.restassured.RestAssured.given;
 
 
