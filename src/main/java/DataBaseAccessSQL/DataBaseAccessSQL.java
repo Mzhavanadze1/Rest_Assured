@@ -12,7 +12,6 @@ public class DataBaseAccessSQL {
 
 @Test
     public static Connection connectSQL() throws SQLException, ClassNotFoundException {
-      //  Class.forName("com.mysql.jdbc.Driver");
         String jdbcUrl = "jdbc:sqlserver://10.195.105.247;encrypt=false;trustServerCertificate=true;";
         String userName = "Training";
         String password = "Aa123456";

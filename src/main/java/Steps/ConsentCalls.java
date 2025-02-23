@@ -2,39 +2,42 @@ package Steps;
 
 import Models.SMSModule.GetConsent.GetSMSRequestModel;
 import Models.SMSModule.PostConsent.PostSmsRequestModel;
+import Utils.ApiGetSpecification;
+import Utils.ApiPostSpecification;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
-import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.*;
 
 public class ConsentCalls {
+    RequestSpecification requestSpecificationGet = ApiGetSpecification.getMethodReqSpec();
+    RequestSpecification requestSpecificationPost= ApiPostSpecification.postMethodReqSpec();
 
     public Response getConsentCalls(GetSMSRequestModel getSMSRequestModel) {
+        Response response ;
+
         if (getSMSRequestModel.getTelNumber() == null) {
-       return given()
-                .headers("content-type", "application/json")
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
+          response = requestSpecificationGet
                 .when()
-                .get("http://10.195.105.66:7000/api/Consent?PersonId=" + getSMSRequestModel.getPersonId());
+                .get("/api/Consent?PersonId=" + getSMSRequestModel.getPersonId());
         }
         else {
-                return given()
-                        .headers("content-type", "application/json")
-                        .contentType(ContentType.JSON)
-                        .accept(ContentType.JSON)
+               response = requestSpecificationGet
                         .when()
-                        .get("http://10.195.105.66:7000/api/Consent?TelNumber=" + getSMSRequestModel.getTelNumber());
+                        .get("/api/Consent?TelNumber=" + getSMSRequestModel.getTelNumber());
         }
+
+        response.then().spec(ApiGetSpecification.getMethodRespSpec());
+        return response;
+
     }
 
-    public Response postConsentCalls(PostSmsRequestModel postSmsRequestModel) {
-        return given()
-                .headers("content-type", "application/json")
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .when()
+
+    public void postConsentCalls(PostSmsRequestModel postSmsRequestModel) {
+        Response response = requestSpecificationPost
                 .body(postSmsRequestModel)
-                .post("http://10.195.105.66:7000/api/Consent");
+                .post();
+        response.then().spec(ApiPostSpecification.postMethodRespSpec());
     }
 }

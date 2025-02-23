@@ -12,28 +12,15 @@ public class ConsentSteps {
         GetSMSResponseModel getSMSResponseModel=new GetSMSResponseModel();
         ConsentCalls consentCalls=new ConsentCalls();
         Response response= consentCalls.getConsentCalls(getSMSRequestModel);
-        int statusCode=response.getStatusCode();
-        if (statusCode == 200){
-            getSMSResponseModel= response.as(GetSMSResponseModel.class);
-            Assert.assertEquals(statusCode,200);
-        }
-        else {
-            Assert.assertNotEquals(statusCode,200);
-        }
+        getSMSResponseModel= response.as(GetSMSResponseModel.class);
+
         return getSMSResponseModel;
     }
 
     public void postConsent(PostSmsRequestModel postSmsRequestModel){
 
         ConsentCalls consentCalls=new ConsentCalls();
-        Response response= consentCalls.postConsentCalls(postSmsRequestModel);
-        int statusCode=response.getStatusCode();
-        if (statusCode == 200){
-            Assert.assertEquals(statusCode,200);
-        }
-        else {
-            Assert.assertNotEquals(statusCode,200);
-        }
+        consentCalls.postConsentCalls(postSmsRequestModel);
 
     }
 
